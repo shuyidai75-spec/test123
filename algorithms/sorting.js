@@ -1,4 +1,8 @@
-const numberCompare = (a, b) => a - b;
+const numberCompare = (a, b) => {
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+};
 
 const assertArray = (items) => {
   if (!Array.isArray(items)) {
@@ -6,21 +10,45 @@ const assertArray = (items) => {
   }
 };
 
-const resolveCompare = (compare) => {
-  if (compare === undefined) return numberCompare;
+const assertFiniteNumbers = (items) => {
+  for (let index = 0; index < items.length; index += 1) {
+    if (!Number.isFinite(items[index])) {
+      throw new TypeError(
+        `items[${index}] must be a finite number when compare is omitted`,
+      );
+    }
+  }
+};
+
+const resolveCompare = (compare, items) => {
+  if (compare === undefined) {
+    assertFiniteNumbers(items);
+    return numberCompare;
+  }
   if (typeof compare !== 'function') {
     throw new TypeError('compare must be a function');
   }
-  return compare;
+
+  return (first, second) => {
+    const result = compare(first, second);
+    if (typeof result !== 'number' || !Number.isFinite(result)) {
+      throw new TypeError('compare must return a finite number');
+    }
+    return result;
+  };
 };
 
 const swap = (items, first, second) => {
-  [items[first], items[second]] = [items[second], items[first]];
+  if (first === second) return;
+
+  const temporary = items[first];
+  items[first] = items[second];
+  items[second] = temporary;
 };
 
 const bubbleSort = (items, compare) => {
   assertArray(items);
-  const compareItems = resolveCompare(compare);
+  const compareItems = resolveCompare(compare, items);
   const result = [...items];
 
   for (let end = result.length - 1; end > 0; end -= 1) {
@@ -41,7 +69,7 @@ const bubbleSort = (items, compare) => {
 
 const insertionSort = (items, compare) => {
   assertArray(items);
-  const compareItems = resolveCompare(compare);
+  const compareItems = resolveCompare(compare, items);
   const result = [...items];
 
   for (let index = 1; index < result.length; index += 1) {
@@ -61,7 +89,7 @@ const insertionSort = (items, compare) => {
 
 const quickSort = (items, compare) => {
   assertArray(items);
-  const compareItems = resolveCompare(compare);
+  const compareItems = resolveCompare(compare, items);
   const result = [...items];
   const ranges = [[0, result.length - 1]];
 

@@ -1,0 +1,12 @@
+{
+  "name": "test123",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test algorithms/sorting.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
